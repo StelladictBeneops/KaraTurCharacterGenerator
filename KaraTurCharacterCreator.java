@@ -1,34 +1,56 @@
 import java.util.Scanner;
 import java.util.Arrays;
+import java.util.Random;
+
 
 public class KaraTurCharacterCreator {
     public static void main(String[] args) {
         Scanner sushiPrinter = new Scanner(System.in);
 
-        String[] theClasses = {"Barbarian", "Bushi", "Kensai", "Monk", "Ninja", "Samurai", "Shukenja", "Sohei", "Wu Jen", "Yakuza"}; // String array for character class
-        String[] theRaces = {"Human", "Korobokuru", "Hengeyokai", "Spirit Folk"}; // String array for character race
-        String[] theSpirit = {"Bamboo", "River", "Sea"}; // String array for character spirit
-        String[] theCreature = {"Carp", "Cat", "Crab", "Crane", "Dog", "Drake", "Fox", "Hare", "Monkey", "Raccoon Dog", "Rat", "Sparrow"}; // String array for character creature
-        String[] theAlignmentGNEs = {"Good", "Neutral", "Evil"}; // String array for character good/neutral/evil alignment
-        String[] theAlignmentLNCs = {"Lawful", "Neutral", "Chaotic"}; // String array for character lawful/neutral/chaotic alignment
-        String[] theAbilityScores = {"Strength", "Dexterity", "Constitution", "Intelligence", "Wisdom", "Charisma"};
+        String[] theClasses = {"Barbarian", "Bushi", "Kensai", "Monk", "Ninja", "Samurai", "Shukenja", "Sohei", "Wu Jen", "Yakuza"};
+        String[] theRaces = {"Human", "Korobokuru", "Hengeyokai", "Spirit Folk"};
+        String[] theSpirit = {"Bamboo", "River", "Sea"};
+        String[] theCreature = {"Carp", "Cat", "Crab", "Crane", "Dog", "Drake", "Fox", "Hare", "Monkey", "Raccoon Dog", "Rat", "Sparrow"};
+        String[] theAlignmentGNEs = {"Good", "Neutral", "Evil"}; 
+        String[] theAlignmentLNCs = {"Lawful", "Neutral", "Chaotic"}; 
 
-        String myClass = getMyClass(theClasses); // String for character class
-        String myRace = getMyRace(theRaces); // String for character race
-    	  String mySecondary;
-        String myAlignmentGNE; // String for character good/neutral/evil alignment
-        String myAlignmentLNC; // String for character lawful/neutral/chaotic alignment
-        String[] theAbilityScores; // String array for character ability scores
-        int[] myAbilityScores; // Integer array for character ability scores
+        String myClass = getMyClass(theClasses); 
+        String myRace = getMyRace(theRaces); 
+    	String mySecondary;
+        String myAlignmentGNE; 
+        String myAlignmentLNC; 
 
         if(myRace.equals("Hengeyokai") || myRace.equals("Spirit Folk")){
             mySecondary = getMySecondary(myClass, myRace, theSpirit, theCreature);
-        } else {
-            // leave mySecondary undeclared
-        }
+        } else {}
+        
         myAlignmentGNE = (myClass, myRace, mySecondary, theAlignmentGNEs);
         myAlignmentLNC = (myClass, myRace, mySecondary, theAlignmentLNCs);
-        myAbilityScores = getMyAbilityScores(myClass, myRace, mySecondary);        
+
+        int STR = getSTR(myClass, myRace, mySecondary);
+        int DEX = getDEX(myClass, myRace, mySecondary);
+        int CON = getCON(myClass, myRace, mySecondary);
+        int INT = getINT(myClass, myRace, mySecondary);
+        int WIS = getWIS(myClass, myRace, mySecondary);
+        int CHA = getCHA(myClass, myRace, mySecondary);
+        int COM = getCOM(myRace, CHA);
+
+        System.out.println("Character Name: " + myName());
+        System.out.println("Class: " + myClass());
+        if (mySecondary != null) {
+            System.out.println("Race: " + mySecondary + " " + myRace());
+        } else {
+            System.out.println("Race: " + myRace());
+        }
+        System.out.println("Ability Scores:");
+        System.out.println("STR: " + STR);
+        System.out.println("DEX: " + DEX);
+        System.out.println("CON: " + CON);
+        System.out.println("INT: " + INT);
+        System.out.println("WIS: " + WIS);
+        System.out.println("CHA: " + CHA);
+        System.out.println("COM: " + COM);
+        
         }
 
         public static String getMyClass(String[] classes) {
@@ -196,11 +218,251 @@ public class KaraTurCharacterCreator {
             int userInput = scanner.nextInt();
             return availableOptions[userInput - 1];
         }
+        
+        public static int roll3d6() {
+            Random rand = new Random();
+            int result = 0;
+            for (int i = 0; i < 3; i++) {
+                result += rand.nextInt(6) + 1;
+            }
+            return result;
+        }
 
-        // helper method to remove a string from an array
-        private static String[] removeStringFromArray(String[] array, String stringToRemove) {
+        public static int roll6TimesTakeHighest() {
+            int highest = 0;
+            for (int i = 0; i < 6; i++) {
+                int roll = roll3d6();
+                if (roll > highest) {
+                    highest = roll;
+                }
+            }
+            return highest;
+        }
+
+        private static int getSTR(String myClass, String myRace, String mySecondary) {
+            int STR = roll6TimesTakeHighest();
+            if (myRace.equals("Korobokuru")) {
+                STR++;
+            }
+            if (mySecondary.equals("Carp")) {
+                STR--;
+            } else if (mySecondary.equals("Crab")) {
+                STR += 2;
+            } else if (mySecondary.equals("Hare")) {
+                STR--;
+            } else if (mySecondary.equals("Raccoon Dog")) {
+                STR += 2;
+            }
+            if (myRace.equals("Spirit Folk") && STR < 6) {
+                STR = 6;
+            } else if (myRace.equals("Korobokuru") && STR < 8) {
+                STR = 8;
+            } else if ((myClass.equals("Shukenja") || myClass.equals("Bushi")) && STR < 9) {
+                STR = 9;
+            } else if ((myRace.equals("Hengeyokai") || myClass.equals("Kensai")) && STR < 12) {
+                STR = 12;
+            } else if ((myClass.equals("Samurai") || myClass.equals("Sohei")) && STR < 13) {
+                STR = 13;
+            } else if ((myClass.equals("Barbarian") || myClass.equals("Monk")) && STR < 15) {
+                STR = 15;
+            } else if ((myClass.equals("Shukenja") || myClass.equals("Monk") || myClass.equals("Wu Jen") || myClass.equals("Yakuza")) && STR > 18) {
+                STR = 18;
+            }
+            return STR;
+        }
+    
+        public static int getDEX(String myClass, String myRace, String mySecondary) {
+            int DEX = roll6TimesTakeHighest();
+
+            if (mySecondary.equals("Cat")) {
+                DEX += 1;
+            } else if (mySecondary.equals("Crane")) {
+                DEX -= 1;
+            } else if (mySecondary.equals("Drake")) {
+                DEX -= 1;
+            } else if (mySecondary.equals("Monkey")) {
+                DEX += 2;
+            }
+
+            if (myRace.equals("Korobokuru") && DEX < 6) {
+                DEX = 6;
+            } else if (myClass.equals("Bushi") && DEX < 8) {
+                DEX = 8;
+            } else if (myRace.equals("Hengeyokai") && DEX < 9) {
+                DEX = 9;
+            } else if (myRace.equals("Spirit Folk") && DEX < 12) {
+                DEX = 12;
+            } else if ((myClass.equals("Kensai") || myClass.equals("Barbarian") || myClass.equals("Ninja")) && DEX < 14) {
+                DEX = 14;
+            } else if (myClass.equals("Monk") && DEX < 15) {
+                DEX = 15;
+            }
+
+            return DEX;
+        }
+
+        public static int getCON(String myClass, String myRace, String mySecondary) {
+            int CON = roll6TimesTakeHighest();
+
+            if (myRace.equals("Korobokuru")) {
+                CON += 1;
+            }
+
+            if (mySecondary.equals("Dog")) {
+                CON += 1;
+            } else if (mySecondary.equals("Rat")) {
+                CON += 2;
+            } else if (mySecondary.equals("Sparrow")) {
+                CON -= 2;
+            }
+
+            if (CON < 6 && myRace.equals("Spirit Folk")) {
+                CON = 6;
+            } else if (CON < 8 && myClass.equals("Bushi")) {
+                CON = 8;
+            } else if (CON < 9 && myClass.equals("Shukenja")) {
+                CON = 9;
+            } else if (CON < 10 && myClass.equals("Sohei")) {
+                CON = 10;
+            } else if (CON < 11 && myClass.equals("Monk")) {
+                CON = 11;
+            } else if (CON < 12 && (myRace.equals("Korobokuru") || myRace.equals("Hengeyokai"))) {
+                CON = 12;
+            } else if (CON < 13 && myClass.equals("Samurai")) {
+                CON = 13;
+            } else if (CON > 14 && myRace.equals("Spirit Folk")) {
+                CON = 14;
+            } else if (CON < 15 && myClass.equals("Barbarian")) {
+                CON = 15;
+            }
+
+            return CON;
+        }
+
+        public static int getINT(String myClass, String myRace, String mySecondary) {
+            int INT = roll6TimesTakeHighest();
+            if (myRace.equals("Korobokuru")) {
+                INT -= 2;
+            }
+            if (mySecondary.equals("Fox")) {
+                INT += 1;
+            } else if (mySecondary.equals("Dog")) {
+                INT -= 1;
+            }
+
+            if (INT < 3 && myRace.equals("Korobokuru")) {
+                INT = 3;
+            } else if (INT < 12 && (myRace.equals("Hengeyokai") || myRace.equals("Spirit Folk"))) {
+                INT = 12;
+            } else if (INT < 13 && myClass.equals("Wu Jen")) {
+                INT = 13;
+            } else if (INT < 14 && myClass.equals("Samurai")) {
+                INT = 14;
+            } else if (INT > 15 && (myClass.equals("Ninja") || myRace.equals("Korobokuru"))) {
+                INT = 15;
+            }
+            return INT;
+        }
+
+        public int getWIS(String myClass, String myRace, String mySecondary) {
+            int WIS = roll6TimesTakeHighest();
+            if (mySecondary.equals("Carp")) {
+                WIS += 1;
+            } else if (mySecondary.equals("Crane")) {
+                WIS += 1;
+            } else if (mySecondary.equals("Hare")) {
+                WIS += 1;
+            } else if (mySecondary.equals("Cat")) {
+                WIS -= 1;
+            } else if (mySecondary.equals("Fox")) {
+                WIS -= 1;
+            } else if (mySecondary.equals("Monkey")) {
+                WIS -= 2;
+            } else if (mySecondary.equals("Raccoon Dog")) {
+                WIS -= 2;
+            }
+
+            if (WIS < 9 && myRace.equals("Spirit Folk")) {
+                WIS = 9;
+            } else if (WIS < 10 && myClass.equals("Sohei")) {
+                WIS = 10;
+            } else if (WIS < 12 && (myClass.equals("Kensai") || myClass.equals("Shukenja") || myRace.equals("Hengeyokai"))) {
+                WIS = 12;
+            } else if (WIS < 13 && myClass.equals("Samurai")) {
+                WIS = 13;
+            } else if (WIS < 15 && myClass.equals("Monk")) {
+                WIS = 15;
+            } else if (WIS > 16 && myClass.equals("Barbarian")) {
+                WIS = 16;
+            } else if (WIS > 17 && myRace.equals("Korobokuru")) {
+                WIS = 17;
+            }
+
+            return WIS;
+        }
+
+        public static int getCHA(String myClass, String myRace, String mySecondary) {
+            int CHA = roll6TimesTakeHighest();
+            if (mySecondary.equals("Drake")) {
+                CHA += 1;
+            } else if (mySecondary.equals("Sparrow")) {
+                CHA += 2;
+            } else if (mySecondary.equals("Crab")) {
+                CHA -= 2;
+            } else if (mySecondary.equals("Rat")) {
+                CHA -= 2;
+            }
+
+            if (CHA < 12 && myRace.equals("Hengeyokai")) {
+                CHA = 12;
+            } else if (CHA < 14 && (myRace.equals("Spirit Folk") || myClass.equals("Ninja"))) {
+                CHA = 14;
+            } else if (CHA > 16 && myRace.equals("Korobokuru")) {
+                CHA = 16;
+            } else if (CHA > 17 && myRace.equals("Hengeyokai")) {
+                CHA = 17;
+            }
+
+            return CHA;
+        }
+        
+        public static int getCOM(String myRace, int CHA) {
+            int COM = roll6TimesTakeHighest();
+
+            if (myRace.equals("Korobokuru")) {
+                COM -= 2;
+            } else if (myRace.equals("Hengeyokai")) {
+                COM -= 1;
+            } else if (myRace.equals("Spirit Folk")) {
+                COM += 1;
+            }
+
+            if (CHA <= 2) {
+                COM -= 8;
+            } else if (CHA == 3) {
+                COM -= 5;
+            } else if (CHA == 4 || CHA == 5) {
+                COM -= 3;
+            } else if (CHA >= 6 && CHA <= 8) {
+                COM -= 1;
+            } else if (CHA >= 13 && CHA <= 15) {
+                COM += 1;
+            } else if (CHA >= 16 && CHA <= 17) {
+                COM += 2;
+            } else if (CHA == 18) {
+                COM += 3;
+            } else if (CHA >= 19) {
+                COM += 5;
+            }
+
+            return COM;
+        }
+
+    private static String[] removeStringFromArray(String[] array, String stringToRemove) {
             List<String> list = new ArrayList<String>(Arrays.asList(array));
             list.remove(stringToRemove);
             return list.toArray(new String[0]);
         }
+    
+    
 }
